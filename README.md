@@ -46,6 +46,10 @@ This is a tool to send automated calls to deliver messages. It consist in a HTLM
 3. Add the dialplan to your Asterisk:
 
       `cat ASTERISK/extensions.conf >> /etc/asterisk/extensions.conf`
+	
+	FreePBX:
+	
+	'cat ASTERISK/extensions.conf >> /etc/asterisk/extensions_custom.conf'
 
 4. Copy the AGI scripts:
   
@@ -74,3 +78,7 @@ This is a tool to send automated calls to deliver messages. It consist in a HTLM
 
 
 by navaismo@gmail.com
+
+
+update Mysqli by Karlitoxz
+update jquery CDN by Karlitoxz
