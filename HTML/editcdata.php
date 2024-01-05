@@ -15,7 +15,6 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
 </head>
 <body>
 
@@ -70,11 +69,18 @@ if(isset($_POST['button'])){
 		$tel=$_POST["tel"];
 		$campname=$_POST['campname'];
 
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+
+
+$link = new mysqli("localhost", $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
+
 
 		$sql1 = "UPDATE " .$campname. " set Name='$name', LastName='$lastname', Tel='$tel'  where ID='$id'";
-		$result = mysql_query($sql1,$link) or die(mysql_error());
+
+$result = $link->query($sql1) or die($link->error);
 
 
 		$_POST['name'] = '';
@@ -101,15 +107,20 @@ if(isset($_POST['button'])){
 	
 
 					<?php
+
+$link = new mysqli("localhost", "dialeruser", "dialerpass", "dialerdb");
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
 						$pin=$_GET['pin'];
 						$campname=$_GET['campname'];
 
-						$link = mysql_connect("localhost","dialeruser","dialerpass") or die (mysql_error());
-					       mysql_select_db("dialerdb", $link);
 						$sql="SELECT ID,NameCamp,Name,LastName,Tel,Tries FROM " .$campname. " WHERE ID='$pin'";
 
-						$res = mysql_query($sql,$link) or die(mysql_error());
-						$row = mysql_fetch_assoc($res);
+						$res = $link->query($sql) or die($link->error);
+						$row = mysqli_fetch_assoc($res);
+
 						$id=$row['ID'];					
 						$name=$row['Name'];
 						$lastname=$row['LastName'];
@@ -143,6 +154,7 @@ if(isset($_POST['button'])){
 							</p>
 							
 							</div>";
+						$link->close();
 					?>	
 						
 						<!-- Form Buttons -->
@@ -165,6 +177,7 @@ if(isset($_POST['button'])){
 		<!-- Main -->
 	</div>
 </div>
-
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>

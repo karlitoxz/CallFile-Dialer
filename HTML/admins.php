@@ -14,7 +14,6 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -38,7 +37,7 @@ return false;
 		<div id="top">
 			<h1><a href="#">Dialer System</a></h1>
 			<div id="top-navigation">
-				Welcome <strong><?php echo $_SESSION[name];?></strong>
+				Welcome <strong><?php echo $_SESSION['name'];?></strong>
 				<span>|</span>
 				<a href="#">Help</a>
 				<span>|</span>
@@ -85,11 +84,25 @@ return false;
 <!--------------------       ------->
 
 <?php
-			$link = mysql_connect("localhost","dialeruser","dialerpass") or die(mysql_error());
-		        mysql_select_db("dialerdb", $link);
-			$sql="SELECT user_name FROM login_admin order by user_name asc";
-			$res=mysql_query($sql,$link) or die (mysql_error());
-			$fields_num = mysql_num_fields($res);		
+
+	$host="localhost";
+	$user="dialeruser";
+	$pass="dialerpass";
+	$db="dialerdb";
+
+	
+
+$link = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
+
+
+	$sql="SELECT user_name FROM login_admin order by user_name asc";
+	$res = $link->query($sql) or die($link->error);
+	
+	$fields_num = $res->num_rows;
 			
 			echo"	<!-- Content -->
 				<div id='sidebar'>
@@ -109,13 +122,13 @@ return false;
 			echo "<tr>";
 			for($i=0; $i<$fields_num; $i++)
 			{
-				$field = mysql_fetch_field($res);
+				$field = mysqli_fetch_field_direct($res, 0);	
 			    	echo "<th><b>{$field->name}</b></th>";
 			}
 			echo "<th>Control</th>";
 			echo "</tr>\n";
 			$id="test";
-			while($row = mysql_fetch_row($res))
+			while($row = mysqli_fetch_row($res))
 			{
 				echo "<tr>";
 
@@ -127,7 +140,7 @@ echo '<a href=\'editadmin.php?desc='.$cell.'\' onclick="return popup(this,\'wind
 			}
 
  			 echo "</table></div></div></div></form></div></div>";
-			mysql_free_result($result);
+			mysqli_free_result($res);
 			?>
 
 			
@@ -158,11 +171,14 @@ echo '<a href=\'editadmin.php?desc='.$cell.'\' onclick="return popup(this,\'wind
 		$username=$_POST["username"];
 		$password=$_POST["password"];
 
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+		$link = new mysqli($host, $user,$pass, $db);
+		// Verificar la conexión
+		if ($link->connect_error) {
+		    die("Error de conexión: " . $link->connect_error);
+		}
 
 		$sql1 = "INSERT INTO login_admin (user_name,user_pass) VALUES('$username',SHA('$password'))";
-		$result = mysql_query($sql1,$link) or die(mysql_error());
+		$ressult = $link->query($sql1) or die($link->error);
 
 	
 
@@ -221,7 +237,8 @@ echo '<a href=\'editadmin.php?desc='.$cell.'\' onclick="return popup(this,\'wind
 
 <!-- End Container -->
 
-
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 	
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>

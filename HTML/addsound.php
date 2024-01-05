@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	
 </head>
 <body>
 
@@ -114,6 +114,8 @@
 	<!-- Main -->
 	</div>
 </div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>

@@ -4,16 +4,22 @@
 
  $q=$_GET["q"];
 // set_time_zone()
- $con = mysql_connect('localhost', 'dialeruser', 'dialerpass');
- if (!$con)
-   {
-   die('Could not connect: ' . mysql_error());
-   }
 
- mysql_select_db("dialerdb", $con);
+
+	$host="localhost";
+	$user="dialeruser";
+	$pass="dialerpass";
+	$db="dialerdb";
+
+$con = new mysqli("localhost", $user,$pass, $db);
+// Verificar la conexión
+if ($con->connect_error) {
+    die("Error de conexión: " . $con->connect_error);
+}
 
  $sql="SELECT ID,IDcamp,Name,LastName,Tel,Tries,CallStatus,Deliver,SIP_CAUSE FROM " .$q. "  WHERE NameCamp = '" .$q. "'";
- $result = mysql_query($sql)or die(mysql_error());
+
+$result = $con->query($sql) or die($link->error);
 
 
 echo"	<!-- Box -->
@@ -45,7 +51,7 @@ echo"	<!-- Box -->
 	</tr>";
 
 
- while($row = mysql_fetch_array($result))
+ while($row = mysqli_fetch_array($result))
    {
    echo "<tr>";
    echo "<td>" . $row['ID'] . "</td>";
@@ -112,5 +118,6 @@ echo   "</tr>";
   echo "</table></div><br></div></div></div></div></form>";
 
 
- mysql_close($con);
+ $con->close();
+
 ?>

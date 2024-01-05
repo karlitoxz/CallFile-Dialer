@@ -17,26 +17,29 @@ $user="dialeruser";
 $pass="dialerpass";
 $db="dialerdb";
 	
-$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-mysql_select_db($db, $link);
-
+$link = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
 
 /******************** Seleccion de LastIdDial ***************/
 	$sql="SELECT LastIdDial from Campaign WHERE CampaignName='" .$campname. "'";
-	$res=mysql_query($sql,$link) or die("sql1".mysql_error());
-	$row = mysql_fetch_assoc($res);
+	$res = $link->query($sql) or die($link->error);
+	
+	$row = mysqli_fetch_assoc($res);
         $lastID = $row['LastIdDial'];
 	
 /****************** Seleccionamos Los valores de cada registro para generar archivo **********************/
-	$sql2="SELECT ID,Name,LastName,NameCamp,Tel from " .$campname. " WHERE NameCamp='" .$campname. "'  ORDER BY ID ASC";
-	$res2=mysql_query($sql2,$link) or die ("sql2".mysql_error());
-	$fields_num = mysql_num_rows($res2);
 
+	$sql2="SELECT ID,Name,LastName,NameCamp,Tel from " .$campname. " WHERE NameCamp='" .$campname. "'  ORDER BY ID ASC";
+	$res2 = $link->query($sql2) or die($link->error);
+	$fields_num = $res2->num_rows;
 
 if ( $type == 'msg'){ 	
 /**************** Para cada Registro Generamos un archivo CALL el cual llamara al numeor indicado **********/
 	for($i=0; $i<$fields_num; $i++){
-		while ($fila = mysql_fetch_assoc($res2)) {
+		while ($fila = mysqli_fetch_assoc($res2)) {
  			$callfile=fopen("/var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/" .$fila['ID']. "_" .$campname. "_" .$fila['Name']. "" .$fila['LastName']. "_" .$fila['Tel']. ".call","w")or die("error");
 			fputs($callfile,"Channel: LOCAL/s@dialer");
 			fputs($callfile,"\n");
@@ -67,7 +70,7 @@ if ( $type == 'msg'){
 /************************************** Si son llamadas para verificar numero enviamos a contexto dialercheck *****************/
 /**************** Para cada Registro Generamos un archivo CALL el cual llamara al numeor indicado **********/
 	for($i=0; $i<$fields_num; $i++){
-		while ($fila = mysql_fetch_assoc($res2)) {
+		while ($fila = mysqli_fetch_assoc($res2)) {
  			$callfile=fopen("/var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/" .$fila['ID']. "_" .$campname. "_" .$fila['Name']. "" .$fila['LastName']. "_" .$fila['Tel']. ".call","w")or die("error");
 			fputs($callfile,"Channel: LOCAL/s@dialercheck");
 			fputs($callfile,"\n");
@@ -97,8 +100,11 @@ if ( $type == 'msg'){
 
 /***************** Actualizamos cuantas llamadas podemos generar a la vez ********************/ 
 
- $sqlz="UPDATE Campaign SET MaxCalls='" .$calls. "' WHERE CampaignName='" .$campname. "'";
- mysql_query($sqlz,$link) or die("sql3".mysql_error());
+
+
+$sqlz="UPDATE Campaign SET MaxCalls='" .$calls. "' WHERE CampaignName='" .$campname. "'";
+
+$res = $link->query($sqlz) or die($link->error);
 
 /******************* Copiamos el archivo general del cron al directorio de la campania *************/
  exec("cp /var/lib/asterisk/agi-bin/DialerCamps/maincron.php /var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/cron_" .$campname. ".php");
@@ -126,7 +132,8 @@ if ( $type == 'msg'){
 /*********************** Actualizamos el ultimo punto donde nos quedamos *****************/
  $lastID = ($lastID + $calls);
  $sqlu="UPDATE Campaign SET LastIdDial='" .$lastID. "' WHERE CampaignName='" .$campname. "'";
- mysql_query($sqlu,$link) or die("sql3".mysql_error());
+$res = $link->query($sqlu) or die($link->error);
+
 
 /*********************** Añadimos el archivo SH que ejecuta el cron de la campaña al Crontab de asterisk ****/
 $output = shell_exec('crontab -l');

@@ -3,24 +3,32 @@
 
 $q=$_GET['q'];
 
- $con = mysql_connect('localhost', 'dialeruser', 'dialerpass');
- if (!$con)
-   {
-   die('Could not connect: ' . mysql_error());
-   }
+	$host="localhost";
+	$user="dialeruser";
+	$pass="dialerpass";
+	$db="dialerdb";
 
- mysql_select_db("dialerdb", $con);
+$con = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($con->connect_error) {
+    die("Error de conexión: " . $con->connect_error);
+}
 
- $sql="SELECT ID,Name,LastName,Tel,Tries,CallStatus,Deliver,SIP_CAUSE FROM " .$q. "  WHERE NameCamp = '" .$q. "'";
- $result = mysql_query($sql)or die(mysql_error());
 
-$count = mysql_num_fields($result);
+
+$sql="SELECT ID,Name,LastName,Tel,Tries,CallStatus,Deliver,SIP_CAUSE FROM " .$q. "  WHERE NameCamp = '" .$q. "'";
+$result = $con->query($sql) or die($con->error);
+$count = $result->num_rows;
+
 
 for ($i = 0; $i < $count; $i++){ 
-    $header .= mysql_field_name($result, $i)."\t"; 
+
+    $field_info = mysqli_fetch_field_direct($result, $i);
+    $header .= $field_info->name . "\t";
+
 } 
 
-while($row = mysql_fetch_row($result)){ 
+while($row = mysqli_fetch_row($result)){ 
   $line = ''; 
   foreach($row as $value){ 
     if(!isset($value) || $value == ""){ 
@@ -57,6 +65,6 @@ header("Pragma: no-cache");
 header("Expires: 0"); 
 
 echo $header."\n".$data;  
-
+$con->close();
 
 ?>

@@ -5,14 +5,20 @@ $msg ='';
 if(isset($username, $password)) {
     ob_start();
 
-$link = mysql_connect('localhost','dialeruser','dialerpass') or die(mysql_error());
-mysql_select_db('dialerdb', $link);
+$conexion = new mysqli("localhost", "dialeruser", "dialerpass", "dialerdb");
+// Verificar la conexión
+if ($conexion->connect_error) {
+    die("Error de conexión: " . $conexion->connect_error);
+}
 
-    $myusername = stripslashes($username);
-    $mypassword = stripslashes($password);
-    $sql="SELECT * FROM login_admin WHERE user_name='$myusername' and user_pass=SHA('$mypassword')";
-    $result=mysql_query($sql, $link);
-    $count=mysql_num_rows($result);
+	$myusername = stripslashes($username);
+	$mypassword = stripslashes($password);
+
+	$sql="SELECT * FROM login_admin WHERE user_name='$myusername' and user_pass=SHA('$mypassword')";
+
+	$result = $conexion->query($sql);
+	$count = $result->num_rows;
+
     // If result matched $myusername and $mypassword, table row must be 1 row
     if($count==1){
         // Register $myusername, $mypassword and redirect to file "admin.php"

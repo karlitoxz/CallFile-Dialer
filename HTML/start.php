@@ -15,7 +15,7 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	
 
 	<script language="Javascript">
  		function showUser(str){
@@ -102,7 +102,7 @@ echo "<body>";
 		<div id="top">
 			<h1><a href="#">Dialer System</a></h1>
 			<div id="top-navigation">
-				Welcome <strong><?php echo $_SESSION[name];?></strong>
+				Welcome <strong><?php echo $_SESSION['name'];?></strong>
 				<span>|</span>
 				<a href="#">Help</a>
 				<span>|</span>
@@ -170,12 +170,25 @@ echo "<body>";
 									<label>Campaign Name<span></span></label>
 									<?php
 
-							                $link = mysql_connect("localhost","dialeruser","dialerpass") or die(mysql_error());
-							                mysql_select_db("dialerdb", $link);
-							                $res = mysql_query("SELECT  CampaignName FROM Campaign ORDER BY CampaignName asc") or die("Invalid query: " .mysql_error());           
+
+	$host="localhost";
+	$user="dialeruser";
+	$pass="dialerpass";
+	$db="dialerdb";
+
+$link = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
+
+        $sql = "SELECT  CampaignName FROM Campaign ORDER BY CampaignName asc";
+	$res = $link->query($sql) or die($link->error);
+	
+
 									echo "<select class='field size3' name='campname' id='campname'onchange='javascript:showUser(this.value)'>";
 									echo " <option value=''>- Choose -</option>";
-									while ($row = mysql_fetch_assoc($res)) {
+									while ($row = mysqli_fetch_assoc($res)) {
 							                 $va = $row['CampaignName'];
 							                 echo "<option value='$va'>$va</option>";
                  							}
@@ -209,7 +222,8 @@ echo "<body>";
 	</div>
 </div>
 <!-- End Container -->
-
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>

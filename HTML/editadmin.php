@@ -15,7 +15,6 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
 </head>
 <body>
 
@@ -65,11 +64,14 @@ if(isset($_POST['button'])){
 		$username=$_POST["username"];
 		$password=$_POST["password"];
 
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+		$link = new mysqli($host, $user,$pass, $db);
+		// Verificar la conexión
+		if ($link->connect_error) {
+		    die("Error de conexión: " . $link->connect_error);
+		}
 
 		$sql1 = "UPDATE login_admin set user_pass=SHA('$password') where user_name='$username'";
-		$result = mysql_query($sql1,$link) or die(mysql_error());
+		$result = $link->query($sql1) or die($link->error);
 
 
 		$_POST['username'] = '';
@@ -96,12 +98,25 @@ if(isset($_POST['button'])){
 					<?php
 						$desc=$_GET['desc'];
 
-						$link = mysql_connect("localhost","dialeruser","dialerpass") or die (mysql_error());
-					       mysql_select_db("dialerdb", $link);
-						$sql="SELECT user_name,user_pass FROM login_admin WHERE user_name='$desc'";
+$host="localhost";
+$user="dialeruser";
+$pass="dialerpass";
+$db="dialerdb";
+		
 
-						$res = mysql_query($sql,$link) or die(mysql_error());
-						$row = mysql_fetch_assoc($res);
+
+$link = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
+
+
+
+						$sql="SELECT user_name,user_pass FROM login_admin WHERE user_name='$desc'";
+						$res = $link->query($sql) or die($link->error);
+
+						$row = mysqli_fetch_assoc($res);
 						$username=$row['user_name'];
 						$password=$row['password'];
 
@@ -139,6 +154,7 @@ if(isset($_POST['button'])){
 		<!-- Main -->
 	</div>
 </div>
-
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>

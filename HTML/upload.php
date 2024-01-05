@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+error_reporting(E_ALL);
 if (!(isset($_SESSION['login']) && $_SESSION['login'] != '')) {
 header ("Location: index.php");
 }else{ //Continue to current page
@@ -15,7 +15,6 @@ header( 'Content-Type: text/html; charset=utf-8' );
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Dialer System</title>
 	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
 </head>
 <body>
 <!-- Header -->
@@ -25,7 +24,7 @@ header( 'Content-Type: text/html; charset=utf-8' );
 		<div id="top">
 			<h1><a href="#">Dialer System</a></h1>
 			<div id="top-navigation">
-				Welcome <strong><?php echo $_SESSION[name];?></strong>
+				Welcome <strong><?php echo $_SESSION['name'];?></strong>
 				<span>|</span>
 				<a href="#">Help</a>
 				<span>|</span>
@@ -109,8 +108,11 @@ header( 'Content-Type: text/html; charset=utf-8' );
 		$db="dialerdb";
 		$CampaignName=preg_replace("/ /",'_',$_POST['campname']);
 		
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+$link = new mysqli("localhost", $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
 
 
 $sqlc="CREATE TABLE `$CampaignName` (
@@ -127,20 +129,27 @@ $sqlc="CREATE TABLE `$CampaignName` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
-
+$result = $link->query($sqlc);
 		
-		mysql_query($sqlc,$link);
 
-		$sql=mysql_query("SELECT ID FROM  Campaign WHERE CampaignName='$CampaignName'", $link) or die(mysql_error());
-		    if (mysql_num_rows($sql) == 0)
+
+		$sql="SELECT ID FROM  Campaign WHERE CampaignName='$CampaignName'";
+		$result = $link->query($sql);
+		$count = $result->num_rows;
+
+		    if ($count  == 0)
        			{
 				$sql1="INSERT INTO Campaign(CampaignName,LastIdDial) VALUES('$CampaignName','0')";
-				$res1=mysql_query($sql1,$link) or die(mysql_error());
+				$res1 = $link->query($sql1) or die($link->error);
 			}
 
 		$sql2="SELECT ID FROM Campaign WHERE CampaignName='" .$CampiagnName. "'";
-		$res2=mysql_query($sql2,$link) or die("res2");
-		$row = mysql_fetch_assoc($res2);
+
+
+		$res2 = $link->query($sql2) or die($link->error);
+
+		$row = mysqli_fetch_assoc($res2);
+
 	        $myID = $row['ID'];
 		echo $myID;
 
@@ -148,9 +157,12 @@ $sqlc="CREATE TABLE `$CampaignName` (
 		$handle = fopen($_FILES['filenamecsv']['tmp_name'], "r");
  
 		while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+
 		$import="INSERT INTO " .$CampaignName. "(IDcamp,NameCamp,Name,LastName,Tel,Tries) values('$myID','$CampaignName','$data[0]','$data[1]','$data[2]','0')";
+
  		//echo $import;
-		mysql_query($import) or die(mysql_error());
+		
+		$result = $link->query($import) or die($link->error);
 		}
  
 		fclose($handle);
@@ -235,7 +247,8 @@ $sqlc="CREATE TABLE `$CampaignName` (
 	</div>
 </div>
 <!-- End Container -->
-
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+<script src='funciones.js'></script>
 
 <p align="center">&copy; <a href="http://chocotemplates.com/" target="_blank">Design by ChocoTemplates</a> 2012 / Adapted for <a href="http://digital-merge.com" target="_blank">Digital-Merge</a></p><p align="center"><a href="http://about.me/navaismo" target="_blank"> Modified by Navaismo</a></p></body>
 </html>
