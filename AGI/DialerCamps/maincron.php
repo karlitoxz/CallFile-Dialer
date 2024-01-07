@@ -76,8 +76,8 @@ if ($link->connect_error) {
 
 /************* Movemos los archivos en modo secuencial al spool de asterisk definidos por el rango ********/
 	for( $i=$lastID; $i<=$range; $i++){
-		//exec("mv /var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/" .$i. "_* /var/spool/asterisk/outgoing/");
-	echo $i;
+		exec("mv /var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/" .$i. "_* /var/spool/asterisk/outgoing/");
+	echo "i: $i\r\n";
 	}
 
 /************** Actualizamos el ultimo ID movido al Spool ******************/

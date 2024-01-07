@@ -1,0 +1,102 @@
+Video:
+
+https://github.com/navaismo/CallFile-Dialer/tree/master/HTML/css
+https://www.youtube.com/watch?v=qYvHLlV7S0g
+https://www.youtube.com/watch?v=PHTgnfHhFoM&list=PLp81uUzNRxNiiMun4WtZOBxqawBR57fQh
+
+documentacion y ejemplos:
+https://www.voip-info.org/asterisk-manager-api-action-originate/
+
+
+Using Async leads to an OriginateResponse event which contains the failure reason if any. Reason may be one of the following:
+
+0 = no such extension or number. Also bad dial tech ie. name of a sip trunk that doesn’t exist
+1 = no answer
+4 = answered
+5 = busy
+8 = congested or not available (Disconnected Number)
+
+See the ast_control_frame_type enum in frame.h for a complete (and up to date) list of possible reasons.
+The following was derived from the Asterisk 1.6.2.0 source:
+
+1 = Other end has hung up
+2 = Local ring
+3 = Remote end is ringing
+4 = Remote end has answered
+5 = Remote end is busy
+6 = Make it go off-hook
+7 = Line is off-hook
+8 = Congestion (circuits busy)
+
+
+
+
+---------------------
+
+$manager = new AGI_AsteriskManager();
+
+//Extension del agente
+$channel = "SIP/100";
+//Extension destino o numero externo segun dialplan
+$exten = '2600';
+$context = "from-internal";
+$priority = "1";
+$application = "";
+$data = "";
+$timeout = 23000;
+$callerId = "SIP/100";
+$variables = "";
+$account = "";
+$async = "";
+$actionId = "";
+
+
+//Conectar y llamar
+$server = '127.0.0.1';
+$username = 'admin';
+$password = 'admin123';
+
+if ($manager->connect($server, $username, $password)){
+	$resultado = $manager->Originate($channel, $exten, $context, $priority, $application, $data, $timeout, $callerId, $variables, $account, $async, $actionId
+)
+	var_dump($resultado);
+	$manager->disconnect();
+}
+
+--------------- Ejemplos ---------------------
+
+Example 1
+Placing a call from a SIP channel to an extension, this will cause the outside call not to be placed until the SIP channel has picked up:
+
+
+Action: Originate
+Channel: SIP/101test
+Context: default
+Exten: 8135551212
+Priority: 1
+Callerid: 3125551212
+Timeout: 30000
+Variable: var1=23|var2=24|var3=25
+ActionID: ABC45678901234567890
+
+Example 2
+Placing a call from an outgoing channel to a local extension, this will cause the local extension not to ring until the Zap channel has picked up:
+
+
+Action: Originate
+Channel: Zap/g2/8135551212
+Context: default
+Exten: 101
+Priority: 1
+Timeout: 30000 
+Callerid: 3125551212
+
+
+Example 3
+Executing system command:
+
+
+Action: Originate
+Channel: Local/1@dummy 
+Application: ((Asterisk cmd System|System))
+Data: /path/to/script
