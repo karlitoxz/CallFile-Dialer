@@ -3,12 +3,21 @@
 /************* Recibimos las variables a usar ***************/
 if(isset($_POST['campname'])){
 
-$calls=$_POST['calls'];
-$campname=$_POST['campname'];
-$retry=$_POST['retry'] - 1 ;
-$retrytime=$_POST['retrytime'];
-$type=$_POST['type'];
-//echo $type;
+$calls=$_POST['calls'];		//Maximum Calls
+$campname=$_POST['campname']; 	//Campaign Name
+$retry=$_POST['retry'] - 1 ;	//Maximums Retries
+$retrytime=$_POST['retrytime'];	//Retry Time
+$type=$_POST['type']; 		//[msg, dialo]
+
+//debuging:
+/*
+echo "calls: $calls\r\n";
+echo "campname: $campname\r\n";
+echo "retry: $retry\r\n";
+echo "retrytime: $retrytime\r\n";
+echo "type: $type\r\n";
+exit();
+*/
 
 /******************* conexion a BD **********************/
 
@@ -23,12 +32,27 @@ if ($link->connect_error) {
     die("Error de conexión: " . $link->connect_error);
 }
 
+
+//debuging:
+/*
+var_dump($link);
+exit();
+*/
+
 /******************** Seleccion de LastIdDial ***************/
 	$sql="SELECT LastIdDial from Campaign WHERE CampaignName='" .$campname. "'";
 	$res = $link->query($sql) or die($link->error);
 	
 	$row = mysqli_fetch_assoc($res);
         $lastID = $row['LastIdDial'];
+
+//debuging:
+/*
+var_dump($res);
+var_dump($row);
+var_dump($lastID);
+exit();
+*/
 	
 /****************** Seleccionamos Los valores de cada registro para generar archivo **********************/
 
@@ -124,7 +148,8 @@ $res = $link->query($sqlz) or die($link->error);
  exec ("chmod +x /var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/execd_" .$campname. ".sh");
  
 /********************** Movemos los primeros archivos Call para comenzar a llamar *****************/
- for($i=0;$i<=$calls;$i++){
+ for($i=1;$i<=$calls;$i++){
+//echo "i: $i\r\n";
 	 exec("mv /var/lib/asterisk/agi-bin/DialerCamps/" .$campname. "/" .$i. "_* /var/spool/asterisk/outgoing/");
  }
 
