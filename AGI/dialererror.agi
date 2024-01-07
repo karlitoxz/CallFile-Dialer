@@ -11,8 +11,12 @@ $user="dialeruser";
 $pass="dialerpass";
 $db="dialerdb";
 
-$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-mysql_select_db($db, $link);
+$link = new mysqli($host, $user,$pass, $db);
+// Verificar la conexión
+if ($link->connect_error) {
+    die("Error de conexión: " . $link->connect_error);
+}
+
 
 $id=$argv[1];
 $campname=$argv[2];
@@ -22,15 +26,15 @@ $try=$argv[5];
 $sipcause=$argv[6];
 
 	$sql1="SELECT Tries from " .$campname. "  WHERE NameCamp='" .$campname. "' AND ID='" .$id. "'";
-        $res=mysql_query($sql1,$link) or die(mysql_error());
-        $row = mysql_fetch_assoc($res);
+	$res = $link->query($sql1) or die($link->error);
+        $row = mysqli_fetch_assoc($res);
         $dbtry = $row['Tries'];
 
         $trym = $dbtry + $try;
 
 
 	$sql="UPDATE " .$campname. " SET Tries='" .$trym. "',CallStatus='" .$Status. "', Deliver='No', SIP_CAUSE='" .$sipcause. "' WHERE NameCamp='" .$campname. "' AND ID='" .$id. "'";
-	$res=mysql_query($sql,$link)or die(mysql_error());
+	$res = $link->query($sql) or die($link->error);
 	$agi->Hangup();	
 
 ?>
